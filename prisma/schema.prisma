@@ -1,0 +1,432 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USER MANAGEMENT ============
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  
+  // Profile Info
+  dateOfBirth   DateTime?
+  gender        String?
+  height        Float?      // in cm
+  currentWeight Float?      // in kg
+  goalWeight    Float?      // in kg
+  activityLevel String?     // sedentary, light, moderate, active, very_active
+  
+  // Nutrition Goals
+  calorieGoal   Int?
+  proteinGoal   Int?        // in grams
+  carbGoal      Int?        // in grams
+  fatGoal       Int?        // in grams
+  
+  // Preferences
+  dietaryPreference String?  // omnivore, vegetarian, vegan, keto, paleo
+  measurementSystem String   @default("metric") // metric or imperial
+  
+  // Relationships
+  accounts      Account[]
+  sessions      Session[]
+  meals         Meal[]
+  workouts      Workout[]
+  activities    Activity[]
+  weightLogs    WeightLog[]
+  measurements  BodyMeasurement[]
+  photos        ProgressPhoto[]
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  followers     Follow[]      @relation("Following")
+  following     Follow[]      @relation("Followers")
+  chats     Chat[]
+
+  subscription  Subscription?
+participations ChallengeParticipation[] 
+challenges     Challenge[]               
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ NUTRITION ============
+
+model Meal {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  mealType    String       // breakfast, lunch, dinner, snack
+  date        DateTime     @default(now())
+  notes       String?
+  
+  // Aggregated Totals
+  totalCalories Float
+  totalProtein  Float
+  totalCarbs    Float
+  totalFats     Float
+  
+  foodEntries FoodEntry[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId, date])
+}
+
+model FoodEntry {
+  id       String @id @default(cuid())
+  mealId   String
+  meal     Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  
+  foodName     String
+  brand        String?
+  servingSize  String
+  servingUnit  String
+  quantity     Float      @default(1)
+  
+  // Nutrition per serving
+  calories     Float
+  protein      Float
+  carbs        Float
+  fats         Float
+  fiber        Float?
+  sugar        Float?
+  sodium       Float?
+  
+  barcode      String?
+  nutritionixId String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([mealId])
+}
+
+// ============ WORKOUTS ============
+
+model Workout {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name      String
+  date      DateTime   @default(now())
+  duration  Int?       // in minutes
+  caloriesBurned Int?
+  notes     String?
+  isPublic  Boolean    @default(false)
+  
+  exercises Exercise[]
+  posts     Post[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId, date])
+}
+
+model Exercise {
+  id          String  @id @default(cuid())
+  workoutId   String
+  workout     Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  
+  exerciseName String
+  exerciseType String  // strength, cardio, flexibility
+  
+  // For strength training
+  sets        Int?
+  reps        Int?
+  weight      Float?   // in kg or lbs
+  restTime    Int?     // in seconds
+  
+  // For cardio
+  duration    Int?     // in minutes
+  distance    Float?   // in km or miles
+  
+  notes       String?
+  orderIndex  Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([workoutId])
+}
+
+// ============ PROGRESS TRACKING ============
+
+model WeightLog {
+  id     String   @id @default(cuid())
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  weight Float    // in kg or lbs
+  date   DateTime @default(now())
+  notes  String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, date])
+}
+
+model BodyMeasurement {
+  id     String   @id @default(cuid())
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  date   DateTime @default(now())
+  
+  // All measurements in cm or inches
+  neck       Float?
+  chest      Float?
+  waist      Float?
+  hips       Float?
+  bicepLeft  Float?
+  bicepRight Float?
+  thighLeft  Float?
+  thighRight Float?
+  calfLeft   Float?
+  calfRight  Float?
+  
+  notes String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, date])
+}
+
+model ProgressPhoto {
+  id       String   @id @default(cuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  imageUrl String
+  date     DateTime @default(now())
+  category String   // front, back, side
+  notes    String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, date])
+}
+
+// ============ GPS ACTIVITIES ============
+
+model Activity {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  activityType String  // running, cycling, walking, hiking
+  name         String?
+  
+  startTime    DateTime
+  endTime      DateTime?
+  
+  distance     Float?  // in km or miles
+  duration     Int?    // in seconds
+  avgPace      Float?  // min/km or min/mile
+  elevationGain Float? // in meters or feet
+  calories     Int?
+  
+  routeData    Json?   // GeoJSON format
+  isPublic     Boolean @default(false)
+  
+  posts     Post[]
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, startTime])
+}
+
+// ============ SOCIAL FEATURES ============
+
+model Post {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  content    String?
+  imageUrl   String?
+  
+  // Optional linked content
+  activityId String?
+  activity   Activity? @relation(fields: [activityId], references: [id])
+  workoutId  String?
+  workout    Workout?  @relation(fields: [workoutId], references: [id])
+  
+  likesCount    Int @default(0)
+  commentsCount Int @default(0)
+  
+  comments Comment[]
+  likes    Like[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId, createdAt])
+}
+
+model Comment {
+  id      String @id @default(cuid())
+  postId  String
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  content String
+  
+  createdAt DateTime @default(now())
+  
+  @@index([postId])
+}
+
+model Like {
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@id([userId, postId])
+  @@index([postId])
+}
+
+model Follow {
+  followerId  String
+  follower    User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User   @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
+
+// ============ CHALLENGES ============
+
+model Challenge {
+  id          String   @id @default(cuid())
+  creatorId   String
+  creator     User     @relation(fields: [creatorId], references: [id])
+  
+  name        String
+  description String?
+  
+  challengeType String // steps, distance, weight_loss, workout_count
+  goalValue     Float   // target value
+  
+  startDate   DateTime
+  endDate     DateTime
+  
+  isPublic    Boolean  @default(true)
+  
+  participants ChallengeParticipation[]
+  
+  createdAt DateTime @default(now())
+  
+  @@index([startDate, endDate])
+}
+
+model ChallengeParticipation {
+  challengeId     String
+  challenge       Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  currentProgress Float     @default(0)
+  rank            Int?
+  
+  joinedAt DateTime @default(now())
+  
+  @@id([challengeId, userId])
+  @@index([challengeId, rank])
+}
+
+// ============ SUBSCRIPTIONS ============
+
+model Subscription {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  planType String // free, pro, premium
+  status   String // active, canceled, past_due
+  
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+// Add these models:
+model Chat {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String    @default("New Chat")
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@index([userId, createdAt])
+  @@map("chats")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role      String   // user or assistant
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  
+  @@index([chatId, createdAt])
+  @@map("messages")
+}
+
