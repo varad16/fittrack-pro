@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+📖 Table of Contents
 
-## Getting Started
+About
+Features
+Tech Stack
+Getting Started
+Environment Variables
+Database Schema
+API Documentation
+Screenshots
+Roadmap
+Contributing
+License
+Contact
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🎯 About
+FitTrack Pro is a modern, full-stack fitness tracking application designed to help users achieve their health and fitness goals through comprehensive tracking of nutrition, workouts, activities, and progress. Built with cutting-edge technologies and integrated AI features, it provides personalized recommendations and insights to support every step of your fitness journey.
+Why FitTrack Pro?
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+✅ All-in-One Platform - Track nutrition, workouts, GPS activities, and progress in one place
+✅ AI-Powered - Get personalized meal plans and workout routines tailored to your goals
+✅ Data-Driven - Make informed decisions with comprehensive analytics and visualizations
+✅ Social Features - Stay motivated with community challenges and activity sharing
+✅ Mobile-Friendly - Responsive design works seamlessly across all devices
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+✨ Features
+🍎 Nutrition Tracking
 
-## Learn More
+Comprehensive food logging with 800,000+ food items (Nutritionix API)
+Barcode scanner for quick food entry
+Macro tracking (calories, protein, carbs, fats)
+Meal categorization (breakfast, lunch, dinner, snacks)
+Daily nutrition goals with visual progress
+Custom food creation
 
-To learn more about Next.js, take a look at the following resources:
+💪 Workout Management
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Custom workout builder with exercise library
+Set, rep, and weight tracking for strength training
+Duration and calorie burn estimation
+Exercise categorization (strength, cardio, flexibility)
+Workout history and performance analytics
+Progress tracking over time
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🗺️ GPS Activity Tracking
 
-## Deploy on Vercel
+Real-time GPS tracking for outdoor activities
+Route visualization on interactive maps
+Distance, pace, and elevation gain calculations
+Activity types: Running, Cycling, Walking, Hiking
+Exportable route data (GeoJSON format)
+Activity history with detailed statistics
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+📊 Progress Monitoring
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Weight logging with trend analysis
+Body measurement tracking (chest, waist, hips, arms, legs)
+Progress photo uploads with before/after comparisons
+Interactive charts and graphs (Recharts)
+30-day and 90-day progress reports
+Goal tracking and achievement metrics
+
+🤖 AI-Powered Features
+
+AI Meal Planner - Generate personalized meal plans with recipes
+AI Workout Planner - Create custom workout routines
+AI Fitness Coach - Chat-based coaching and motivation
+Recipe suggestions based on dietary preferences
+Intelligent progress insights and recommendations
+
+👥 Social Features
+
+Activity feed with workout and meal sharing
+Follow/follower system
+Like and comment on posts
+Challenge creation and participation
+Leaderboards for competitive motivation
+Public profiles with stats
+
+📈 Analytics & Insights
+
+Interactive dashboard with real-time statistics
+Calorie and macro tracking with progress bars
+Workout frequency analysis
+Weight trend visualization
+Weekly and monthly performance reports
+Data export capabilities
+
+
+🛠️ Tech Stack
+Frontend
+
+Framework: Next.js 14 (App Router)
+Language: TypeScript
+UI Library: React 18
+Styling: Tailwind CSS
+Components: shadcn/ui
+Forms: React Hook Form + Zod
+State Management: TanStack Query (React Query)
+Charts: Recharts
+Maps: Leaflet
+
+Backend
+
+Runtime: Node.js
+API: Next.js API Routes (Serverless)
+ORM: Prisma
+Database: PostgreSQL
+Authentication: NextAuth.js
+File Upload: Uploadthing
+
+External APIs & Services
+
+OpenAI API - AI meal and workout planning
+Nutritionix API - Food database (800,000+ items)
+Azure AI Translation - Multi-language support
+Mapbox/Leaflet - GPS tracking and mapping
+
+Deployment
+
+Hosting: Vercel
+Database: Neon.tech (PostgreSQL)
+CDN: Vercel Edge Network
+Version Control: Git/GitHub
+
